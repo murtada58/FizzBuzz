@@ -13,10 +13,13 @@ namespace FizzBuzz
             
             for (int i = startCount; i <= endCount; i++)
             {
-                if (i % (fizz * buzz) == 0) { Console.WriteLine("FizzBuzz"); }
-                else if (i % fizz == 0) { Console.WriteLine("Fizz"); }
-                else if (i % buzz == 0) { Console.WriteLine("Buzz"); }
-                else { Console.WriteLine(i); }
+                string output = "";
+                
+                if (i % fizz == 0) { output += "Fizz"; }
+                if (i % buzz == 0) { output += "Buzz"; } 
+                if (output == "") { output = i.ToString(); }
+                
+                Console.WriteLine(output);
             }
         }
     }
