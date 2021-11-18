@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace FizzBuzz
 {
@@ -13,9 +14,7 @@ namespace FizzBuzz
             int startCount = 1;
             int endCount = 1000;
 
-            int[] order = {3, 5, 7, 11, 13, 17};
-
-            Dictionary<int, Action<int, Output>> terms = new Dictionary<int, Action<int, Output>>();
+            OrderedDict terms = new OrderedDict();
 
             terms.Add(3, SimplePrint(3, "Fizz"));
             
@@ -58,9 +57,9 @@ namespace FizzBuzz
             for (int i = startCount; i <= endCount; i++)
             {
                 Output output = new Output();
-                foreach (int number in order)
+                foreach (int key in terms)
                 {
-                    terms[number](i, output);
+                    terms.dict[key](i, output);
                 }
 
                 Console.WriteLine(output.Repr() == "" ? i : output.Repr());
@@ -76,7 +75,7 @@ namespace FizzBuzz
         }
     }
 
-    class Output
+    public class Output
     {
         public List<string> value = new List<string>();
         public bool bong = false;
@@ -84,6 +83,23 @@ namespace FizzBuzz
         public string Repr()
         {
             return string.Join("", value);
+        }
+    }
+
+    public class OrderedDict : IEnumerable
+    {
+        private List<int> order = new List<int>();
+        public Dictionary<int, Action<int, Output>> dict = new Dictionary<int, Action<int, Output>>();
+
+        public void Add(int key, Action<int, Output> value)
+        {
+            order.Add(key);
+            dict.Add(key, value);
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return order.GetEnumerator();
         }
     }
 }
