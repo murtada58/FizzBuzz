@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 
@@ -14,23 +15,22 @@ namespace FizzBuzz
 
             int[] order = {3, 5, 7, 11, 13, 17};
 
-            Dictionary<int, Func<int, Output, string>> terms = new Dictionary<int, Func<int, Output, string>>();
+            Dictionary<int, Action<int, Output>> terms = new Dictionary<int, Action<int, Output>>();
+
+            terms.Add(3, SimplePrint(3, "Fizz"));
             
-            terms.Add(3, (number, output) => number % 3 == 0 && !output.bong ? "Fizz" : "" );
+            terms.Add(5, SimplePrint(5, "Buzz"));
             
-            terms.Add(5, (number, output) => number % 5 == 0 && !output.bong ? "Buzz" : "" );
-            
-            terms.Add(7, (number, output) => number % 7 == 0 && !output.bong ? "Bang" : "" );
-            
+            terms.Add(7, SimplePrint(7, "Bang"));
+
             terms.Add(11, (number, output) =>
             {
                 if (number % 11 == 0)
                 {
                     output.bong = true;
                     output.value.Clear();
-                    return "Bong";
+                    output.value.Add("Bong");
                 }
-                return "";
             });
 
             terms.Add(13, (number, output) =>
@@ -49,35 +49,30 @@ namespace FizzBuzz
                         }
                         i++;
                     }
-                    if(placeAtEnd)
-                    {
-                        return "Fezz";
-                    }
+                    if(placeAtEnd) { output.value.Add("Fezz"); }
                 }
-
-                return "";
             });
             
-            terms.Add(17, (number, output) =>
-            {
-                if (number % 17 == 0)
-                {
-                    output.value.Reverse();
-                }
-
-                return "";
-            });
+            terms.Add(17, (number, output) => { if (number % 17 == 0) { output.value.Reverse(); }});
             
             for (int i = startCount; i <= endCount; i++)
             {
                 Output output = new Output();
                 foreach (int number in order)
                 {
-                    output.value.Add(terms[number](i, output));
+                    terms[number](i, output);
                 }
 
                 Console.WriteLine(output.Repr() == "" ? i : output.Repr());
             }
+        }
+
+        public static Action<int, Output> SimplePrint(int activationNumber, string term)
+        {
+            return (number, output) =>
+            {
+                if (number % activationNumber == 0 && !output.bong) { output.value.Add(term); }
+            };
         }
     }
 
